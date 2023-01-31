@@ -1,23 +1,14 @@
-import React, { useMemo, useState } from 'react';
+import React, { useMemo } from 'react';
 import PropTypes from 'prop-types';
 import AppContext from './AppContext';
+import useFetch from '../Hooks/useFetch';
 
 function AppProvider({ children }) {
-  const [planets, setPlanets] = useState([]);
-
-  const fetchPlanets = async (url) => {
-    const promisse = await fetch(url);
-    const response = await promisse.json();
-    response.results.map((planet) => {
-      delete planet.residents;
-      return planet;
-    });
-    setPlanets(response.results);
-  };
+  const { makeFetch, isLoading, erros, planets } = useFetch();
 
   const values = useMemo(() => ({
-    planets, fetchPlanets,
-  }), [planets]);
+    planets, makeFetch, isLoading, erros,
+  }), [planets, isLoading, erros, makeFetch]);
 
   return (
     <AppContext.Provider value={ values }>
