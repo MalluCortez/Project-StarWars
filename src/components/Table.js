@@ -13,7 +13,7 @@ function Table() {
     'orbital_period',
     'diameter',
     'rotation_period',
-    'surface_water ',
+    'surface_water',
   ]);
 
   useEffect(() => {
