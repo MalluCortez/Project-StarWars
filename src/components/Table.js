@@ -5,6 +5,9 @@ function Table() {
   const { planets, makeFetch } = useContext(AppContext);
   const [filteredPlanets, setFilteredPlanets] = useState([]);
   const [searchTerm, setSearchTerm] = useState('');
+  const [filterColumn, setFilterColumn] = useState('population');
+  const [filterComparison, setFilterComparison] = useState('maior que');
+  const [filterValue, setFilterValue] = useState(0);
 
   useEffect(() => {
     makeFetch('https://swapi.dev/api/planets');
@@ -19,7 +22,21 @@ function Table() {
     }
   }, [searchTerm, planets]);
 
-  console.log(planets);
+  const handleClick = () => {
+    const allPlanets = planets.filter((planet) => {
+      if (filterComparison === 'menor que') {
+        return Number(planet[filterColumn]) < Number(filterValue);
+      }
+      if (filterComparison === 'igual a') {
+        return Number(planet[filterColumn]) === Number(filterValue);
+      }
+      if (filterComparison === 'maior que') {
+        return Number(planet[filterColumn]) > Number(filterValue);
+      }
+      return planet;
+    });
+    setFilteredPlanets(allPlanets);
+  };
 
   return (
     <div>
@@ -30,6 +47,37 @@ function Table() {
         value={ searchTerm }
         onChange={ (event) => setSearchTerm(event.target.value) }
       />
+      <select
+        data-testid="column-filter"
+        onChange={ (event) => setFilterColumn(event.target.value) }
+      >
+        <option value="population">population</option>
+        <option value="orbital_period">orbital_period</option>
+        <option value="diameter">diameter</option>
+        <option value="rotation_period">rotation_period</option>
+        <option value="surface_water">surface_water</option>
+      </select>
+      <select
+        data-testid="comparison-filter"
+        onChange={ (event) => setFilterComparison(event.target.value) }
+      >
+        <option value="maior que">maior que</option>
+        <option value="menor que">menor que</option>
+        <option value="igual a">igual a</option>
+      </select>
+      <input
+        data-testid="value-filter"
+        type="number"
+        value={ filterValue }
+        onChange={ (event) => setFilterValue(event.target.value) }
+      />
+      <button
+        data-testid="button-filter"
+        type="button"
+        onClick={ handleClick }
+      >
+        Filtrar
+      </button>
       <table>
         <thead>
           <tr>
