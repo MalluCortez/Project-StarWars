@@ -8,10 +8,52 @@ function Table() {
   const [filterColumn, setFilterColumn] = useState('population');
   const [filterComparison, setFilterComparison] = useState('maior que');
   const [filterValue, setFilterValue] = useState(0);
+  const [allInputs, setAllInputs] = useState([]);
 
   useEffect(() => {
     makeFetch('https://swapi.dev/api/planets');
   }, []);
+
+  const NumberFilter = () => {
+    const NumberFilterObj = {
+      column: filterColumn,
+      comparison: filterComparison,
+      value: filterValue,
+    };
+    setAllInputs([...allInputs, NumberFilterObj]);
+  };
+
+  const filtersSelects = (
+    allPlanets,
+    filterCom,
+    filterCol,
+    filterVal,
+  ) => allPlanets.filter((planet) => {
+    if (filterCom === 'menor que') {
+      return Number(planet[filterCol]) < Number(filterVal);
+    }
+    if (filterCom === 'igual a') {
+      return Number(planet[filterCol]) === Number(filterVal);
+    }
+    if (filterCom === 'maior que') {
+      return Number(planet[filterCol]) > Number(filterVal);
+    }
+    return planet;
+  });
+
+  useEffect(() => {
+    const allPlanets = allInputs.reduce((acc, curr) => filtersSelects(
+      acc,
+      curr.comparison,
+      curr.column,
+      curr.value,
+    ), planets);
+    setFilteredPlanets(allPlanets);
+  }, [allInputs]);
+
+  const handleClick = () => {
+    NumberFilter();
+  };
 
   useEffect(() => {
     if (searchTerm === '') {
@@ -22,22 +64,6 @@ function Table() {
     }
   }, [searchTerm, planets]);
 
-  const handleClick = () => {
-    const allPlanets = planets.filter((planet) => {
-      if (filterComparison === 'menor que') {
-        return Number(planet[filterColumn]) < Number(filterValue);
-      }
-      if (filterComparison === 'igual a') {
-        return Number(planet[filterColumn]) === Number(filterValue);
-      }
-      if (filterComparison === 'maior que') {
-        return Number(planet[filterColumn]) > Number(filterValue);
-      }
-      return planet;
-    });
-    setFilteredPlanets(allPlanets);
-  };
-
   return (
     <div>
       <input
@@ -46,10 +72,13 @@ function Table() {
         placeholder="Filtrar por nome..."
         value={ searchTerm }
         onChange={ (event) => setSearchTerm(event.target.value) }
+        id="name-filter"
       />
       <select
         data-testid="column-filter"
         onChange={ (event) => setFilterColumn(event.target.value) }
+        value={ filterColumn }
+        id="column-filter"
       >
         <option value="population">population</option>
         <option value="orbital_period">orbital_period</option>
@@ -60,6 +89,8 @@ function Table() {
       <select
         data-testid="comparison-filter"
         onChange={ (event) => setFilterComparison(event.target.value) }
+        value={ filterComparison }
+        id="comparison-filter"
       >
         <option value="maior que">maior que</option>
         <option value="menor que">menor que</option>
@@ -70,11 +101,13 @@ function Table() {
         type="number"
         value={ filterValue }
         onChange={ (event) => setFilterValue(event.target.value) }
+        id="value-filter"
       />
       <button
         data-testid="button-filter"
         type="button"
         onClick={ handleClick }
+        id="button-filter"
       >
         Filtrar
       </button>
