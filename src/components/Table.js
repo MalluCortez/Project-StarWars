@@ -26,7 +26,12 @@ function Table() {
       comparison: filterComparison,
       value: filterValue,
     };
-    setAllInputs([...allInputs, NumberFilterObj]);
+    const filtrosAtualizados = [...allInputs, NumberFilterObj];
+    const columnAvailable = allColumn
+      .filter((col) => !filtrosAtualizados.some((fil) => fil.column === col));
+    setAllInputs(filtrosAtualizados);
+    console.log(columnAvailable);
+    setFilterColumn(columnAvailable[0]);
   };
 
   const filtersSelects = (
@@ -69,6 +74,11 @@ function Table() {
         .includes(searchTerm)));
     }
   }, [searchTerm, planets]);
+
+  const removeFilter = (column) => {
+    const delFilter = allInputs.filter((filter) => filter.column !== column);
+    setAllInputs(delFilter);
+  };
 
   return (
     <div>
@@ -114,6 +124,29 @@ function Table() {
       >
         Filtrar
       </button>
+      <div>
+        {allInputs.length > 0 && allInputs.map((filt, i) => (
+          <div key={ i } data-testid="filter">
+            <p key={ filt }>
+              {`${filt.column}
+          ${filt.comparison} ${filt.value}`}
+            </p>
+            <button
+              type="button"
+              onClick={ () => removeFilter(filt.column) }
+            >
+              x
+            </button>
+          </div>
+        ))}
+        <button
+          type="button"
+          onClick={ () => setAllInputs([]) }
+          data-testid="button-remove-filters"
+        >
+          Remover todas filtragens
+        </button>
+      </div>
       <table>
         <thead>
           <tr>
