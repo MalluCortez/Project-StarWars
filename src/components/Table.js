@@ -9,6 +9,12 @@ function Table() {
   const [filterComparison, setFilterComparison] = useState('maior que');
   const [filterValue, setFilterValue] = useState(0);
   const [allInputs, setAllInputs] = useState([]);
+  const [allColumn] = useState(['population',
+    'orbital_period',
+    'diameter',
+    'rotation_period',
+    'surface_water ',
+  ]);
 
   useEffect(() => {
     makeFetch('https://swapi.dev/api/planets');
@@ -80,11 +86,8 @@ function Table() {
         value={ filterColumn }
         id="column-filter"
       >
-        <option value="population">population</option>
-        <option value="orbital_period">orbital_period</option>
-        <option value="diameter">diameter</option>
-        <option value="rotation_period">rotation_period</option>
-        <option value="surface_water">surface_water</option>
+        {allColumn.filter((col) => !allInputs.some((fil) => fil.column === col))
+          .map((col) => <option key={ col } value={ col }>{col}</option>)}
       </select>
       <select
         data-testid="comparison-filter"
